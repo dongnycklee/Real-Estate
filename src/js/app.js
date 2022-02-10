@@ -37,7 +37,7 @@ App = {
 		$.getJSON('RealEstate.json', function(data) {
       App.contracts.RealEstate = TruffleContract(data);
       App.contracts.RealEstate.setProvider(App.web3Provider);
-      return App.loadRealEstates();
+      App.listenToEvents();
     });
   },
 
@@ -97,7 +97,16 @@ App = {
   },
 	
   listenToEvents: function() {
-	
+    App.contracts.RealEstate.deployed().then(function(instance) {
+      instance.LogBuyRealEstate({}, { fromBlock: 0, toBlock: 'latest'}).watch(function(error, event) {
+        if (!error) {
+          $('#events').append('<p>' + event.args._buyer + ' 계정에서 ' + event.args._id + ' 번 매물을 매입했습니다.' + '</p>');
+        } else {
+          console.error(error);
+        }
+        App.loadRealEstates();
+      })
+    })
   }
 };
 
@@ -112,5 +121,19 @@ $(function() {
 
     $(e.currentTarget).find('#id').val(id);
     $(e.currentTarget).find('#price').val(price);
+  });
+
+  $('#buyerInfoModal').on('show.bs.modal', function(e) {
+    var id = $(e.relatedTarget).parent().find('.id').text();
+    
+    App.contracts.RealEstate.deployed().then(function(instance) {
+      return instance.getBuyerInfo.call(id);
+    }).then(function(buyerInfo){
+      $(e.currentTarget).find('#buyerAddress').text(buyerInfo[0]);
+      $(e.currentTarget).find('#buyerName').text(web3.toUtf8(buyerInfo[1]));
+      $(e.currentTarget).find('#buyerAge').text(buyerInfo[2]);
+    }).catch(function(err) {
+      console.log(err.message);
+    })
   });
 });
