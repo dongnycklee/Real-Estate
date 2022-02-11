@@ -60,7 +60,6 @@ App = {
         $('#name').val('');
         $('#age').val('');
         $('#buyModal').modal('hide');
-        return App.loadRealEstates();
       }).catch(function(err) {
         console.log(err.message);
       });
