@@ -12,7 +12,7 @@ contract RealEstate {
   address public owner;
   address[10] public buyers; //매물을 10개로 배열에 저장한다
 
-  //블록안에 저장할 이벤트함수
+  //블록안에 저장할 이벤트함수 계정과 매물번호를 저장해서 다른사용자에게 어떤매물을 어떤 주소가 매입했는지 알려줄 이벤트
   event LogBuyRealEstate(
     address _buyer,
     uint _id
@@ -30,7 +30,7 @@ contract RealEstate {
     buyerInfo[_id] = Buyer(msg.sender, _name, _age); //현재 매물을 매입한주소와,이름,나이를 대입한다
 
     owner.transfer(msg.value); //owner[컨트랙의주인계정] 으로 트랜스퍼 함수롤사용 이더를 송금한다
-    emit LogBuyRealEstate(msg.sender, _id);
+    emit LogBuyRealEstate(msg.sender, _id); //이벤트 발생 buyRealEstate 를 이용해서 이벤트를발생하여 블록에저장 블록logs에 저장이되고 args를 사용해 프론트에서 확인및출력이 가능하다
   }
 
   function getBuyerInfo(uint _id) public view returns (address, bytes32, uint) {
