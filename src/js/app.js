@@ -2,11 +2,13 @@ App = {
   web3Provider: null,
   contracts: {},
 	
+  // 프론트 로딩시 json파일을 불러와서 로딩시키기위해 init 함수안에 json파일을 불러와서 이미지,아이디,타입,면적,가격 을 저장한다
   init: function() {
     $.getJSON('../real-estate.json', function(data) {
       var list = $('#list');
       var template = $('#template');
 
+      //for문을 사용해 json을 data에 저장한곳을 하나하나 돌면서 템플릿에 부여 htmlappend list에 저장한다
       for (i = 0; i < data.length; i++) {
         template.find('img').attr('src', data[i].picture);
         template.find('.id').text(data[i].id);
@@ -18,21 +20,23 @@ App = {
       }
     })
 
-    return App.initWeb3();
+    return App.initWeb3();//위에 템플릿저장까지끝나면 initWeb3 함수를 불러온다
   },
 
+  //컨트랙 인스턴스화
   initWeb3: function() {
-    if (typeof  web3 !== 'undefined') {
-      App.web3Provider = web3.currentProvider;
-      web3 = new Web3(web3.currentProvider);
+    if (typeof  web3 !== 'undefined') { //주입된 인스턴스가 존재하게되면
+      App.web3Provider = web3.currentProvider; //web3provider 전역변수에 공급자를 불러오고
+      web3 = new Web3(web3.currentProvider); //공급자의 정보를 바탕으로 Dapp에서 사용할수있는 오브젝트를 생성
     } else {
       App.web3Provider = new web3.providers.HttpProvider('http://localhost:8545');
       web3 = new Web3(App.web3Provider);
     }
 
-    return App.initContract();
+    return App.initContract(); //위작업이 끝나면 initcontract함수를 불러온다
   },
 
+  //컨트랙 인스턴스화
   initContract: function() {
 		$.getJSON('RealEstate.json', function(data) {
       App.contracts.RealEstate = TruffleContract(data);
@@ -41,6 +45,7 @@ App = {
     });
   },
 
+  //매입했을때 구매함수
   buyRealEstate: function() {	
     var id = $('#id').val();
     var name = $('#name').val();
@@ -57,7 +62,7 @@ App = {
         var nameUtf8Encoded = utf8.encode(name);
         return instance.buyRealEstate(id, web3.toHex(nameUtf8Encoded), age, { from: account, value: price});
       }).then(function() {
-        $('#name').val('');
+        $('#name').val(''); //모달창 인풋필드 초기화
         $('#age').val('');
         $('#buyModal').modal('hide');
       }).catch(function(err) {
@@ -109,17 +114,19 @@ App = {
   }
 };
 
+//
 $(function() {
+  //프론트 로딩시 불러오는부분 window 함수사용
   $(window).load(function() {
-    App.init();
+    App.init(); //init 함수를 불러온다 (json파일)
   });
 
-  $('#buyModal').on('show.bs.modal', function(e) {
+  $('#buyModal').on('show.bs.modal', function(e) { //매입버튼을 클릭했을때 모달창이 켜있을경우
     var id = $(e.relatedTarget).parent().find('.id').text();
-    var price = web3.toWei(parseFloat($(e.relatedTarget).parent().find('.price').text() || 0), "ether");
+    var price = web3.toWei(parseFloat($(e.relatedTarget).parent().find('.price').text() || 0), "ether"); //템플릿에있는 가격타입을 text(string) 타입인데 float타입으로바꾸고  towei를 ether타입으로 바꾼다
 
-    $(e.currentTarget).find('#id').val(id);
-    $(e.currentTarget).find('#price').val(price);
+    $(e.currentTarget).find('#id').val(id); //id값을 찾아서 전달
+    $(e.currentTarget).find('#price').val(price); //가격값을 찾아서 전달
   });
 
   $('#buyerInfoModal').on('show.bs.modal', function(e) {
