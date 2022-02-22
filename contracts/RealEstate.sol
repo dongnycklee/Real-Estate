@@ -33,11 +33,13 @@ contract RealEstate {
     emit LogBuyRealEstate(msg.sender, _id); //이벤트 발생 buyRealEstate 를 이용해서 이벤트를발생하여 블록에저장 블록logs에 저장이되고 args를 사용해 프론트에서 확인및출력이 가능하다
   }
 
+  //읽기전용함수 매입자
   function getBuyerInfo(uint _id) public view returns (address, bytes32, uint) {
-    Buyer memory buyer = buyerInfo[_id];
-    return (buyer.buyerAddress, buyer.name, buyer.age);
+    Buyer memory buyer = buyerInfo[_id]; //buyer함수에 buyerinfo 인덱스,메모리에 저장한다
+    return (buyer.buyerAddress, buyer.name, buyer.age); //위값을 리턴
   }
 
+  //모든매입자의 읽기전용함수 가시성퍼블릭
   function getAllBuyers() public view returns (address[10]) {
     return buyers;
   }
