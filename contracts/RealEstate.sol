@@ -1,5 +1,5 @@
 pragma solidity ^0.4.23;
-
+//소유자 생성자 함수 배포할때 단한번만 호출되도록 컨트랙의 소유자를 정해준다
 contract RealEstate {
   struct Buyer {
     address buyerAddress;
@@ -15,7 +15,7 @@ contract RealEstate {
     address _buyer,
     uint _id
   );
-
+  //msg.sender = 현재 사용하는 계정 을 owner상태변수에 대입해줘서 이컨트랙의 주인은 현재 배포하는컨트랙의 주인을 정해준다
   constructor() public {
     owner = msg.sender;
   }
