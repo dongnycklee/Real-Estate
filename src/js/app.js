@@ -41,7 +41,7 @@ App = {
 		$.getJSON('RealEstate.json', function(data) {
       App.contracts.RealEstate = TruffleContract(data);
       App.contracts.RealEstate.setProvider(App.web3Provider);
-      App.listenToEvents();
+      App.listenToEvents();//리스트 불러오기 or 매물구매했다는 이벤트 불러오기
     });
   },
 
@@ -52,15 +52,16 @@ App = {
     var price = $('#price').val();
     var age = $('#age').val();
 
-    web3.eth.getAccounts(function(error, accounts) {
-      if (error) {
+    web3.eth.getAccounts(function(error, accounts) {  
+      if (error) {  //콜백 에러 콘솔에 에러창
         console.log(error);
       }
 
-      var account = accounts[0];
+      var account = accounts[0]; //0번째 계정 account 저장
+
       App.contracts.RealEstate.deployed().then(function(instance) {
-        var nameUtf8Encoded = utf8.encode(name);
-        return instance.buyRealEstate(id, web3.toHex(nameUtf8Encoded), age, { from: account, value: price});
+        var nameUtf8Encoded = utf8.encode(name); //utf8 인코딩
+        return instance.buyRealEstate(id, web3.toHex(nameUtf8Encoded), age, { from: account, value: price}); //bytes32 타입을 hex타입으로변환 
       }).then(function() {
         $('#name').val(''); //모달창 인풋필드 초기화
         $('#age').val('');
@@ -71,15 +72,16 @@ App = {
     });
   },
 
+  //매물판매가되면 판매완료처리
   loadRealEstates: function() {
     App.contracts.RealEstate.deployed().then(function(instance) {
       return instance.getAllBuyers.call();
     }).then(function(buyers) {
       for (i = 0; i < buyers.length; i++) {
-        if (buyers[i] !== '0x0000000000000000000000000000000000000000') {
+        if (buyers[i] !== '0x0000000000000000000000000000000000000000') { //해당 buyers 배열에 주소가 존재한다면 (0x00이부분은 빈주소를 의미한다)
           var imgType = $('.panel-realEstate').eq(i).find('img').attr('src').substr(7);
 
-          switch(imgType) {
+          switch(imgType) { //팔린이미지로 교체
             case 'apartment.jpg':
             $('.panel-realEstate').eq(i).find('img').attr('src', 'images/apartment_sold.jpg')
             break;
@@ -91,8 +93,8 @@ App = {
             break;
           }
 
-          $('.panel-realEstate').eq(i).find('.btn-buy').text('매각').attr('disabled', true);
-          $('.panel-realEstate').eq(i).find('.btn-buyerInfo').removeAttr('style');
+          $('.panel-realEstate').eq(i).find('.btn-buy').text('매각').attr('disabled', true); //텍스트를 매각으로바꾸고 버튼 비활성화
+          $('.panel-realEstate').eq(i).find('.btn-buyerInfo').removeAttr('style');//매입자정보버튼 활성화
         }
       }
     }).catch(function(err) {
@@ -100,6 +102,7 @@ App = {
     })
   },
 	
+  //매물이 판매되면 이벤트로 모든사용자에게 명시된다
   listenToEvents: function() {
     App.contracts.RealEstate.deployed().then(function(instance) {
       instance.LogBuyRealEstate({}, { fromBlock: 0, toBlock: 'latest'}).watch(function(error, event) {
@@ -116,7 +119,7 @@ App = {
 
 //
 $(function() {
-  //프론트 로딩시 불러오는부분 window 함수사용
+  //프론트 로딩시 불러오는부분 window 함수사용.
   $(window).load(function() {
     App.init(); //init 함수를 불러온다 (json파일)
   });
@@ -129,7 +132,7 @@ $(function() {
     $(e.currentTarget).find('#price').val(price); //가격값을 찾아서 전달
   });
 
-  $('#buyerInfoModal').on('show.bs.modal', function(e) {
+  $('#buyerInfoModal').on('show.bs.modal', function(e) { //매입자정보버튼 모달창 활성화
     var id = $(e.relatedTarget).parent().find('.id').text();
     
     App.contracts.RealEstate.deployed().then(function(instance) {
