@@ -128,7 +128,7 @@ $(function() {
     var id = $(e.relatedTarget).parent().find('.id').text();
     var price = web3.toWei(parseFloat($(e.relatedTarget).parent().find('.price').text() || 0), "ether"); //템플릿에있는 가격타입을 text(string) 타입인데 float타입으로바꾸고  towei를 ether타입으로 바꾼다
 
-    $(e.currentTarget).find('#id').val(id); //id값을 찾아서 전달
+    $(e.currentTarget).find('#id').val(id); //id값을 찾아서 전달!
     $(e.currentTarget).find('#price').val(price); //가격값을 찾아서 전달
   });
 
