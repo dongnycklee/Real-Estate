@@ -7,7 +7,7 @@ contract RealEstate {
     bytes32 name;
     uint age;
   }
-  //상태변수로 매입자의 맵핑함수를써서 매입자의 정보를 불러온다
+  //상태변수로 매입자의 맵핑함수를써서 매입자의 정보를 불러온다!
   mapping (uint => Buyer) public buyerInfo;
   address public owner;
   address[10] public buyers; //매물을 10개로 배열에 저장한다
